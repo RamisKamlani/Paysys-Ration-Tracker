@@ -2,13 +2,13 @@ import MapViewer from './MapViewer';
 import { useEffect, useState } from 'react';
 import { db } from './db';
 
+const SERVER_URL = 'https://paysys-ration-tracker-production.up.railway.app';
 
 export default function App() {
   const [name, setName] = useState('');
   const [locations, setLocations] = useState([]);
   const [showMap, setShowMap] = useState(false);
 
-  // Load all locations from IndexedDB
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -41,7 +41,7 @@ export default function App() {
             lat: latitude,
             lng: longitude,
             timestamp: new Date().toISOString(),
-            synced: false
+            synced: false,
           };
           const id = await db.locations.add(newRecord);
           setLocations((prev) => [...prev, { ...newRecord, id }]);
@@ -56,62 +56,59 @@ export default function App() {
     );
   };
 
-const syncToServer = async () => {
-  try {
-    const all = await db.locations.toArray();
-    const unsynced = all.filter((l) => l.synced === false);
+  const syncToServer = async () => {
+    try {
+      const all = await db.locations.toArray();
+      const unsynced = all.filter((l) => l.synced === false);
 
-    if (unsynced.length === 0) {
-      alert('All data already synced!');
-      return;
+      if (unsynced.length === 0) {
+        alert('All data already synced!');
+        return;
+      }
+
+      const confirmed = window.confirm('Are you sure you want to transfer this data?');
+      if (!confirmed) return;
+
+      const response = await fetch(`${SERVER_URL}/api/locations/bulk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(unsynced),
+      });
+
+      if (!response.ok) throw new Error('Server error');
+
+      for (let record of unsynced) {
+        await db.locations.update(record.id, { synced: true });
+      }
+
+      const updated = await db.locations.toArray();
+      setLocations(updated);
+
+      alert(`${unsynced.length} location(s) synced successfully!`);
+    } catch (error) {
+      console.error('Sync failed:', error);
+      alert('Failed to sync data.');
     }
+  };
 
-    const confirmed = window.confirm('Are you sure you want to transfer this data?');
+  const deleteLocation = async (id) => {
+    const confirmed = window.confirm('Are you sure you want to delete this location from the local device?');
     if (!confirmed) return;
 
-    const response = await fetch('/api/locations/bulk', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(unsynced)
-    });
-
-    if (!response.ok) throw new Error('Server error');
-
-    // Mark all as synced
-    for (let record of unsynced) {
-      await db.locations.update(record.id, { synced: true });
+    try {
+      await db.locations.delete(id);
+      const updated = await db.locations.toArray();
+      setLocations(updated);
+      alert('Location deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete location:', error);
+      alert('Something went wrong while deleting.');
     }
+  };
 
-    const updated = await db.locations.toArray();
-    setLocations(updated);
-
-    alert(`${unsynced.length} location(s) synced successfully!`);
-  } catch (error) {
-    console.error('Sync failed:', error);
-    alert('Failed to sync data.');
-  }
-};
-
-
-const deleteLocation = async (id) => {
-  const confirmed = window.confirm('Are you sure you want to delete this location from the local device?');
-  if (!confirmed) return;
-
-  try {
-    await db.locations.delete(id);
-    const updated = await db.locations.toArray();
-    setLocations(updated);
-    alert('Location deleted successfully.');
-  } catch (error) {
-    console.error('Failed to delete location:', error);
-    alert('Something went wrong while deleting.');
-  }
-};
-
-
-  const handleKeyDown = (e) => { 
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       captureLocation();
     }
@@ -121,8 +118,7 @@ const deleteLocation = async (id) => {
     return (
       <div className="container">
         <img src="/paysys.jpg" alt="Paysys Labs Logo" className="top-logo" />
-
-        <h1 className="main-title">📍 Ration Location Tracker - Paysys </h1>
+        <h1 className="main-title">📍 Ration Location Tracker - Paysys</h1>
 
         <section className="card">
           <div className="card-header">1️⃣ Capture Location</div>
@@ -141,7 +137,6 @@ const deleteLocation = async (id) => {
           <button onClick={syncToServer}>🔄 Transfer Data</button>
         </section>
 
-
         <section className="card">
           <div className="card-header">📋 Captured Data</div>
           {locations.length === 0 ? (
@@ -151,7 +146,7 @@ const deleteLocation = async (id) => {
               {locations.map((loc) => (
                 <li key={loc.id}>
                   <strong>{loc.name}</strong><br />
-                  Lat: {loc.lat ? loc.lat.toFixed(4) : 'N/A'}, Lng: {loc.lng ? loc.lng.toFixed(4) : 'N/A'}<br />
+                  Lat: {loc.lat?.toFixed(4) ?? 'N/A'}, Lng: {loc.lng?.toFixed(4) ?? 'N/A'}<br />
                   {loc.synced ? '✅ Synced' : '❌ Not Synced'}
                   <br />
                   <button
@@ -165,17 +160,18 @@ const deleteLocation = async (id) => {
             </ul>
           )}
         </section>
+
         <section className="card">
-  <div className="card-header">🗺️ View Synced Locations</div>
-  <button onClick={() => setShowMap(!showMap)}>
-    {showMap ? 'Hide Map' : 'Show Map'}
-  </button>
-  {showMap && (
-    <div className="map-box">
-      <MapViewer />
-    </div>
-  )}
-</section>
+          <div className="card-header">🗺️ View Synced Locations</div>
+          <button onClick={() => setShowMap(!showMap)}>
+            {showMap ? 'Hide Map' : 'Show Map'}
+          </button>
+          {showMap && (
+            <div className="map-box">
+              <MapViewer />
+            </div>
+          )}
+        </section>
       </div>
     );
   } catch (error) {
