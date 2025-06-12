@@ -41,7 +41,7 @@ app.delete('/api/locations/:index', (req, res) => {
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // ✅ Fallback: serve index.html for any other route (for React Router)
-app.get('*', (req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
