@@ -14,7 +14,7 @@ export default function MapViewer() {
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/locations')
+    fetch('/api/locations/bulk')
       .then((res) => res.json())
       .then((data) => setLocations(data))
       .catch((err) => console.error('Error fetching locations:', err));
@@ -31,13 +31,13 @@ export default function MapViewer() {
   if (!confirm) return;
 
   try {
-    const res = await fetch(`http://localhost:5000/api/locations/${index}`, {
+    const res = await fetch(`/api/locations/bulk${index}`, {
       method: 'DELETE',
     });
 
     if (!res.ok) throw new Error('Failed to delete');
 
-    const updated = await fetch('http://localhost:5000/api/locations');
+    const updated = await fetch('/api/locations/bulk');
     const data = await updated.json();
     setLocations(data);
     alert('Location deleted.');
