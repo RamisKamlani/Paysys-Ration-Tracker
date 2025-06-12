@@ -69,7 +69,7 @@ const syncToServer = async () => {
     const confirmed = window.confirm('Are you sure you want to transfer this data?');
     if (!confirmed) return;
 
-    const response = await fetch('http://localhost:5000/api/locations/bulk', {
+    const response = await fetch('/api/locations/bulk', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
