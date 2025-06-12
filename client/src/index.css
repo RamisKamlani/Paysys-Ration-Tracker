@@ -1,0 +1,131 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f4ff;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.container {
+  max-width: 600px;
+  width: 95%;
+  padding: 30px 20px;
+  margin: 20px auto;
+}
+
+.main-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #003366;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0055aa;
+  margin-bottom: 15px;
+  background-color: #eef5ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.map-box {
+  height: 200px;
+  margin-top: 12px;
+  background-color: #d9e8ff;
+  border: 1px dashed #007bff;
+  border-radius: 6px;
+  text-align: center;
+  line-height: 200px;
+  color: #444;
+}
+
+.location-list {
+  padding-left: 0;
+  list-style: none;
+  margin-top: 12px;
+}
+
+.location-list li {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.top-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  height: 50px;
+  width: auto;
+  border-radius: 6px;
+}
+
+.map-box {
+  margin-top: 16px;
+  height: 400px;
+  width: 100%;
+}
+
+.custom-marker .label {
+  color: red;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  transform: translateY(-8px);
+  white-space: nowrap;
+}
+
+.custom-marker .dot {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.custom-dot-only .dot {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+}
